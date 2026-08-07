@@ -9,8 +9,11 @@ void check_result(
         int A,
         int B,
         int op,
-        int expected,
-        const std:: string name
+        int expected_Y,
+        int expected_carry,
+        int expected_zero,
+        int expected_overflow,
+        const std:: string& name
     )
     {
         alu->A = A;
@@ -19,14 +22,41 @@ void check_result(
 
         alu->eval();
 
-        if(alu->Y != expected){
-            std::cout << name << " FAILED. Expected"
-                        << expected
-                        << " Got "
-                        << (int)alu->Y
-                        << std::endl;
+        bool pass = true;
+
+        if(alu->Y != expected_Y)
+        {
+            pass = false;
+            std::cout << name 
+                  << " Y FAILED. Expected "
+                  << expected_Y
+                  << " Got "
+                  << (int)alu->Y
+                  << std::endl;
         }
-        else{
+
+        if(alu->carry != expected_carry){
+            pass = false;
+            std::cout << name
+                <<"CARRY FAILED"
+                <<std::endl;
+        }
+
+        if(alu->zero != expected_zero){
+            pass = false;
+            std::cout << name
+                <<"ZERO FAILED"
+                <<std::endl;
+        }
+
+        if(alu->overflow != expected_overflow){
+            pass = false;
+            std::cout << name
+                << "OVERFLOW FAILED"
+                << std::endl;
+        }
+
+        if (pass){
             std::cout << name << " PASSED\n";
         }
     }
@@ -56,14 +86,20 @@ int main(int argc, char** argv)
     tfp->open("waves/alu_wave.vcd");
 
     
-    check_result(alu, 15, 1, ADD, 16, "ADD");
-    check_result(alu, 20, 5, SUB, 15, "SUB");
-    check_result(alu, 0b1100, 0b1010, AND, 0b1000, "AND");
-    check_result(alu, 0b1100, 0b1010, OR, 0b1110, "OR");
-    check_result(alu, 0b1100, 0b1010, XOR, 0b0110, "XOR");
-    check_result(alu, 0b00001111, 0, NOT, 0b11110000, "NOT");
-    check_result(alu, 0b00001111, 0, SHL, 0b00011110, "SHIFT LEFT");
-    check_result(alu, 0b00001110, 0, SHR, 0b00000111, "SHIFT RIGHT");
+    // Basic ALU operation tests
+    check_result(alu, 15,         1,          ADD, 16,         0, 0, 0, "ADD");
+    check_result(alu, 20,         3,          SUB, 17,         0, 0, 0, "SUB");
+    check_result(alu, 0b1100,     0b1010,     AND, 0b1000,     0, 0, 0, "AND");
+    check_result(alu, 0b1100,     0b1010,     OR,  0b1110,     0, 0, 0, "OR");
+    check_result(alu, 0b1100,     0b1010,     XOR, 0b0110,     0, 0, 0, "XOR");
+    check_result(alu, 0b00001111, 0,          NOT, 0b11110000, 0, 0, 0, "NOT");
+    check_result(alu, 0b00001111, 0,          SHL, 0b00011110, 0, 0, 0, "SHIFT LEFT");
+    check_result(alu, 0b00001110, 0,          SHR, 0b00000111, 0, 0, 0, "SHIFT RIGHT");
+
+    // Flag tests
+    check_result(alu, 255, 1, ADD,   0,   1, 1, 0, "ADD CARRY");
+    check_result(alu, 127, 1, ADD, 128,   0, 0, 1, "ADD OVERFLOW");
+    check_result(alu,   5, 5, SUB,   0,   0, 1, 0, "SUB ZERO");
 
     
     tfp->close();

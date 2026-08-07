@@ -5,11 +5,18 @@ $timescale 1ps $end
   $var wire 8 # B [7:0] $end
   $var wire 3 $ op [2:0] $end
   $var wire 8 % Y [7:0] $end
+  $var wire 1 & carry $end
+  $var wire 1 ' zero $end
+  $var wire 1 ) overflow $end
   $scope module alu $end
    $var wire 8 " A [7:0] $end
    $var wire 8 # B [7:0] $end
    $var wire 3 $ op [2:0] $end
    $var wire 8 % Y [7:0] $end
+   $var wire 1 & carry $end
+   $var wire 1 ' zero $end
+   $var wire 1 ) overflow $end
+   $var wire 9 ( result [8:0] $end
   $upscope $end
  $upscope $end
 $enddefinitions $end
